@@ -1,3 +1,5 @@
+## Tekton Demo repository
+
 Tekton installation
 ```
 kubectl apply \
@@ -173,3 +175,82 @@ kubectl apply -f test-build-task.yaml
 kubectl apply -f test-pipeline.yaml
 ```
 
+Commit files in repo
+```
+git init
+git add .
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/iliusa77/tekton.git
+git push -u origin main
+```
+
+Create pvc
+```
+kubectl apply -f test-pvc.yaml
+```
+
+Create and check pipeline-run
+```
+kubectl create -f test-pipeline-run.yaml
+
+kubectl get pipelinerun
+NAME                   SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+git-test-build-hkwtv   True        Succeeded   100s        78s
+```
+
+Check PVC and pods
+```
+kubectl get pvc
+NAME              STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE
+test-tekton-pvc   Bound    pvc-3bd74fde-fe91-4162-8e60-dbd65d104d4c   1Gi        RWO            standard       <unset>                 7m58s
+
+kubectl get po
+NAME                             READY   STATUS      RESTARTS      AGE
+git-test-build-hkwtv-build-pod   0/1     Completed   0             34s
+git-test-build-hkwtv-clone-pod   0/1     Completed   0             51s
+git-test-build-hkwtv-test-pod    0/1     Completed   0             42s
+```
+
+Check logs build pod
+```
+kubectl logs git-test-build-hkwtv-build-pod -c step-build
+Building application...
+Build completed!
+total 12
+drwxr-xr-x    2 root     root          4096 Sep 17 13:32 .
+drwxrwxrwx    4 root     root          4096 Sep 17 13:32 ..
+-rw-r--r--    1 root     root            62 Sep 17 13:32 app.sh
+```
+
+Our first full-fledged Tekton CI pipeline is running successfully from start to finish. 🎉
+
+The final result:
+```
+GitHub
+   │
+   ▼
+┌─────────────┐
+│    clone    │  git-clone Task
+└──────┬──────┘
+       │
+       │ app.sh
+       ▼
+┌─────────────┐
+│     PVC     │  shared workspace
+└──────┬──────┘
+       │
+       ▼
+┌─────────────┐
+│     test    │  run-tests Task
+└──────┬──────┘
+       │
+       │ tests passed
+       ▼
+┌─────────────┐
+│    build    │  build Task
+└──────┬──────┘
+       │
+       ▼
+   build/app.sh
+```

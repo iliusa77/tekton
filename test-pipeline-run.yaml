@@ -13,4 +13,5 @@ spec:
 
   workspaces:
     - name: shared-workspace
-      emptyDir: {}
+      persistentVolumeClaim:
+        claimName: test-tekton-pvc
