@@ -1,0 +1,23 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: build
+spec:
+  steps:
+    - name: build
+      image: alpine:3.20
+      script: |
+        #!/bin/sh
+        echo "Building application..."
+---
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: test
+spec:
+  steps:
+    - name: test
+      image: alpine:3.20
+      script: |
+        #!/bin/sh
+        echo "Running tests..."

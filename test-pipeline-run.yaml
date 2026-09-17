@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  generateName: git-test-build-
+spec:
+
+  pipelineRef:
+    name: git-test-build
+
+  params:
+    - name: repo-url
+      value: https://github.com/iliusa77/tekton.git
+
+  workspaces:
+    - name: shared-workspace
+      emptyDir: {}

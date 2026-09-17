@@ -1,0 +1,54 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: git-test-build
+spec:
+
+  params:
+    - name: repo-url
+      type: string
+
+  workspaces:
+    - name: shared-workspace
+
+  tasks:
+
+    - name: clone
+      taskRef:
+        name: git-clone
+
+      params:
+        - name: url
+          value: $(params.repo-url)
+
+        - name: revision
+          value: main
+
+        - name: deleteExisting
+          value: "true"
+
+      workspaces:
+        - name: output
+          workspace: shared-workspace
+
+    - name: test
+      runAfter:
+        - clone
+
+      taskRef:
+        name: run-tests
+
+      workspaces:
+        - name: source
+          workspace: shared-workspace
+
+    - name: build
+      runAfter:
+        - test
+
+      taskRef:
+        name: build
+
+      workspaces:
+        - name: source
+          workspace: shared-workspace
