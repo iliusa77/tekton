@@ -5,6 +5,9 @@ metadata:
 spec:
   pipelineRef:
     name: production-ci
+  
+  taskRunTemplate:
+    serviceAccountName: tekton-build-sa
 
   params:
     - name: repo-url

@@ -13,6 +13,9 @@ spec:
   steps:
     - name: build-and-push
       image: gcr.io/kaniko-project/executor:v1.23.2
+      env:
+        - name: DOCKER_CONFIG
+          value: /tekton/creds/.docker/
       args:
         - --dockerfile=$(workspaces.source.path)/Dockerfile
         - --context=$(workspaces.source.path)

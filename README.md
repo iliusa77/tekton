@@ -292,6 +292,11 @@ Data
 .dockerconfigjson:  185 bytes
 ```
 
+Create service account
+```
+kubectl apply -f tekton-build-sa.yaml
+```
+
 Create and check Production CI Pipeline
 ```
 kubectl apply -f production-ci-pipeline.yaml
@@ -299,9 +304,44 @@ kubectl apply -f production-ci-pipeline.yaml
 kubectl get pipeline
 ```
 
+Create `tekton-demo` repository in https://hub.docker.com/repository/docker/iliusa77/tekton-demo
+
 Create and get Production CI Pipeline Run
 ```
 kubectl create -f production-ci-run.yaml
 
 kubectl get pipelinerun
+NAME                   SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+production-ci-79c5p    True        Succeeded   27s         3s
 ```
+
+Check build pod status and logs
+```
+kubectl get po production-ci-79c5p-build-image-pod
+NAME                                  READY   STATUS      RESTARTS   AGE
+production-ci-79c5p-build-image-pod   0/1     Completed   0          69s
+
+kubectl logs production-ci-79c5p-build-image-pod
+Defaulted container "step-build-and-push" out of: step-build-and-push, prepare (init)
+INFO[0001] Retrieving image manifest alpine:3.20        
+INFO[0001] Retrieving image alpine:3.20 from registry index.docker.io 
+INFO[0002] Built cross stage deps: map[]                
+INFO[0002] Retrieving image manifest alpine:3.20        
+INFO[0002] Returning cached image manifest              
+INFO[0002] Executing 0 build triggers                   
+INFO[0002] Building stage 'alpine:3.20' [idx: '0', base-idx: '-1'] 
+INFO[0002] Unpacking rootfs as cmd COPY app-in-docker.sh /app/app.sh requires it. 
+INFO[0003] COPY app-in-docker.sh /app/app.sh            
+INFO[0003] Taking snapshot of files...                  
+INFO[0003] RUN chmod +x /app/app.sh                     
+INFO[0003] Initializing snapshotter ...                 
+INFO[0003] Taking snapshot of full filesystem...        
+INFO[0003] Cmd: /bin/sh                                 
+INFO[0003] Args: [-c chmod +x /app/app.sh]              
+INFO[0003] Running: [/bin/sh -c chmod +x /app/app.sh]   
+INFO[0003] Taking snapshot of full filesystem...        
+INFO[0003] CMD ["/app/app.sh"]                          
+INFO[0003] Pushing image to docker.io/iliusa77/tekton-demo:latest 
+INFO[0006] Pushed index.docker.io/iliusa77/tekton-demo@sha256:9c7f810ba2cb9fd1a9d610a7ca91da6073b1394c543df5c8f57c27974d360ff4 
+```
+
