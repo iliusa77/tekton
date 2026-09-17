@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1
+kind: PipelineRun
+metadata:
+  generateName: production-ci-
+spec:
+  pipelineRef:
+    name: production-ci
+
+  params:
+    - name: repo-url
+      value: https://github.com/iliusa77/tekton.git
+
+    - name: image
+      value: docker.io/iliusa77/tekton-demo:latest
+
+  workspaces:
+    - name: shared-workspace
+      persistentVolumeClaim:
+        claimName: test-tekton-pvc

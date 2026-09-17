@@ -254,3 +254,54 @@ GitHub
        ▼
    build/app.sh
 ```
+
+
+## Pipeline with Docker build/push
+
+Create build image task
+```
+kubectl apply -f build-image-task.yaml
+```
+
+Create secret with DockerHub credentials
+```
+kubectl create secret docker-registry dockerhub-secret \
+  --docker-server=https://index.docker.io/v1/ \
+  --docker-username=YOUR_DOCKERHUB_USERNAME \
+  --docker-password=YOUR_DOCKERHUB_TOKEN
+```
+
+Annotate secret
+```
+kubectl annotate secret dockerhub-secret \
+  tekton.dev/docker-0=https://index.docker.io
+```
+
+Check secret annotations
+```
+kubectl describe secret dockerhub-secret
+Name:         dockerhub-secret
+Namespace:    default
+Labels:       <none>
+Annotations:  tekton.dev/docker-0: https://index.docker.io
+
+Type:  kubernetes.io/dockerconfigjson
+
+Data
+====
+.dockerconfigjson:  185 bytes
+```
+
+Create and check Production CI Pipeline
+```
+kubectl apply -f production-ci-pipeline.yaml
+
+kubectl get pipeline
+```
+
+Create and get Production CI Pipeline Run
+```
+kubectl create -f production-ci-run.yaml
+
+kubectl get pipelinerun
+```
